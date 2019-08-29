@@ -19,5 +19,10 @@ sql = """
 
 cur = conn.cursor()
 cur.execute(sql)
+# print("sql", sql)
 if __name__ == '__main__':
-    print('Yes!!!Main function executing')
+    try:
+        print('Yes!!!Main function executing', sys.argv[1])
+
+    except IndexError:
+        print("IndexError")
