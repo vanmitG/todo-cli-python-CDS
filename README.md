@@ -18,8 +18,8 @@ Here's a walkthrough of implemented user stories. -->
 
 The following **required** functionalities are completed:
 
-- [ ] The user can run your program from the command line.
-- [ ] The user can see all todos from the command line by passing a list command, sorted with the ones due first.
+- [x] The user can run your program from the command line.
+- [x] The user can see all todos from the command line by passing a list command, sorted with the ones due first.
 - [ ] The user can add a todo from the command line by passing an add argument. The fields specified should be body, due_date, and project_id. The fields due_date and project_id are optional. Only body is required.
 - [ ] By default todos are incomplete.
 - [ ] The user should see a message giving information about the todo that was added.

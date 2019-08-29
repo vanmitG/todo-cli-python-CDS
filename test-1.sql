@@ -1,3 +1,3 @@
 -- SQLite
-INSERT INTO `todos` (id, body, due_date, status)
-VALUES (2,"finish cli","29/08/2019","not complete");
+INSERT INTO `todos` (body, due_date)
+VALUES ("finish cli","27/08/2019");
