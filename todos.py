@@ -8,7 +8,7 @@ from datetime import datetime
 DEFAULT_PATH = os.path.join(os.path.dirname(__file__), 'database.sqlite3')
 conn = sqlite3.connect(DEFAULT_PATH)
 
-sql = """
+sql_todos = """
   CREATE TABLE IF NOT EXISTS todos(
     id INTEGER PRIMARY KEY,
     body TEXT NOT NULL,
@@ -16,25 +16,28 @@ sql = """
     status TEXT DEFAULT "incomplete",
     user_id INTERGER
     project_id INTEGER
-  );
+  )
+"""
+sql_users = """
   CREATE TABLE IF NOT EXISTS users(
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT NOT NULL
-  );
-  CREATE TABLE IF NOT EXISTS projects(
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    due_date TEXT NOT NULL,
-    status TEXT DEFAULT "incomplete",
-    project_id INTEGER
   )
 
-
+"""
+sql_projects = """
+  CREATE TABLE IF NOT EXISTS projects(
+    id INTEGER PRIMARY KEY,
+    name TEXT
+  )
 """
 
+
 cur = conn.cursor()
-cur.execute(sql)
+cur.execute(sql_todos)
+cur.execute(sql_users)
+cur.execute(sql_projects)
 # print("sql", sql)
 
 
@@ -84,17 +87,17 @@ def print_results(results):
 
 
 def add(body):
+    sql = """
+
+      INSERT INTO `todos` (body, due_date, project_id)
+      VALUES (?, ?, ?);
+
+    """
+
     try:
         print("add", body)
     except:
         print("argument error, try python todos.py --help  for more information")
-
-    sql = """
-
-      INSERT INTO `todos` (id, body, due_date)
-      VALUES (3,"finish cli","29/08/2019");
-
-    """
 
 
 def lists(thingy=None, *listTodo):
