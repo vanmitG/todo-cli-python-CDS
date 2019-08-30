@@ -1,5 +1,5 @@
 -- SQLite
-SELECT body,projects.name,users.name, 
+SELECT projects.name,users.name
 FROM todos
 LEFT JOIN users
 ON todos.user_id = users.id

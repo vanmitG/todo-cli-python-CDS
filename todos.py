@@ -385,7 +385,7 @@ def list_project(*listProject):
     print_results(results, "projects")
 
 
-def staff():
+def staff(*staffTodo):
     sql = """
         SELECT projects.name,users.name
         FROM todos
@@ -397,7 +397,7 @@ def staff():
     """
     cur.execute(sql)
     results = cur.fetchall()
-    print_results(results, " ")
+    print_results(results, "lines")
 
 
 def helps():
