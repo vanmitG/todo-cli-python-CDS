@@ -27,17 +27,18 @@ The following **required** functionalities are completed:
 - [x] User can mark a todo as incomplete by passing a command and an id.
 - [x] If the user does not supply the correct arguments, or supplies a --help flag, the user sees a usage message.
 - [x] The user can supply arguments to the list command to only see todos that are complete.
+- [x] The user can change body of a todo.
 
 Optional Requirements
 
 The following **optional** features are implemented:
 
-- [ ] The user can supply arguments to the list command to only see todos of a particular project_id.
-- [ ] The user can supply arguments to the list command to reverse the default sort, to now see the todos by due_date descending.
-- [ ] The user can supply arguments to the list command to combine the above options.
-- [ ] The user can add a user_id to each todo.
-- [ ] The user can add a user to the system by passing add_user. Each user should have a name, email_address, and id.
-- [ ] The user can call a list_users command that shows all the users in the system.
+- [x] The user can supply arguments to the list command to only see todos of a particular project_id.
+- [x] The user can supply arguments to the list command to reverse the default sort, to now see the todos by due_date descending.
+- [x] The user can supply arguments to the list command to combine the above options.
+- [] The user can add a user_id to each todo.
+- [] The user can add a user to the system by passing add_user. Each user should have a name, email_address, and id.
+- [] The user can call a list_users command that shows all the users in the system.
 - [ ] The user can call a staff command that shows each project, combined with each of the users working on that project.
 - [ ] The user can call a who_to_fire command that lists all users who are not currently assigned a todo.
 - [ ] The user can add a project by calling add_project. Each project must have a name.

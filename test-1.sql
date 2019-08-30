@@ -1,2 +1,3 @@
 -- SQLite
-ALTER TABLE todos ADD COLUMN project_id INTERGER
+SELECT id FROM projects
+WHERE

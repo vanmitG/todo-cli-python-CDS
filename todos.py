@@ -46,27 +46,42 @@ def show_help_menu():
     print("*"*18)
     print("__List all todos: ")
     print("python todos.py --list")
-    print("-"*16)
+    print("-"*23)
+    print("__List all todos in reverse order: ")
+    print("python todos.py --list all d")
+    print("-"*23)
     print("__List completed todos: ")
     print("python todos.py --list done")
-    print("-"*16)
+    print("-"*23)
+    print("__List completed todos in reverse: ")
+    print("python todos.py --list done d")
+    print("-"*23)
     print("__List not completed todos: ")
     print("python todos.py --list not-done")
-    print("-"*16)
+    print("-"*23)
+    print("__List not completed todos in reverse: ")
+    print("python todos.py --list not-done d")
+    print("-"*23)
+    print("__List all todos in a project: ")
+    print('python todos.py --list project project_id <a/d> (for sorted by due_date)')
+    print("-"*23)
     print("__Add a new todo: ")
     print('python todos.py --add', '"My Todo Body"')
-    print("-"*16)
+    print("-"*23)
     print("__Delete a todo: ")
     print("python todos.py --delete 1")
-    print("-"*16)
+    print("-"*23)
     print("__Mark a todo complete: ")
     print("python todos.py --do 1")
-    print("-"*16)
+    print("-"*23)
     print("__Mark a todo uncomplete: ")
     print("python todos.py --undo 1")
-    print("-"*16)
+    print("-"*23)
     print("__Modify a todo body: ")
-    print('python todos.py --update', '"My new Todo Body"')
+    print('python todos.py --update id', '"My new Todo Body"')
+    print("-"*23)
+    print("__Add user_id to a todo: ")
+    print('python todos.py --add_user_id user-id todo-id')
 
 
 def handle_arg_errors(cmd):
@@ -75,10 +90,39 @@ def handle_arg_errors(cmd):
     show_help_menu()
 
 
-def validate_id(id):
+def validate_todos_id(id):
     sql = """
         SELECT id FROM todos
-        ORDER BY due_date
+        """
+    cur.execute(sql)
+    results = cur.fetchall()
+    # print(type(results[2]))
+    for tup1 in results:
+        # extract int from tuple
+        num = tup1[0]
+        if id == num:
+            return id
+    return None
+
+
+def validate_proj_id(id):
+    sql = """
+        SELECT id FROM projects
+        """
+    cur.execute(sql)
+    results = cur.fetchall()
+    # print(type(results[2]))
+    for tup1 in results:
+        # extract int from tuple
+        num = tup1[0]
+        if id == num:
+            return id
+    return None
+
+
+def validate_user_id(id):
+    sql = """
+        SELECT id FROM users
         """
     cur.execute(sql)
     results = cur.fetchall()
@@ -124,30 +168,87 @@ def add(body, due_date, project_id=None, *addTodos):
     print("Successfully Add New Todos")
 
 
-def lists(thingy=None, *listTodo):
-    # print("extra argument", listTodo)
+def lists(thingy=None, d=None, *listTodo):
+    print("extra argument", listTodo)
+    print("argument", thingy, d)
     results = []
-    if thingy == None:
+    if thingy == None and d == None:
         sql = """
-        SELECT * FROM todos
-        ORDER BY due_date
+          SELECT * FROM todos
+          ORDER BY due_date
         """
         cur.execute(sql)
         results = cur.fetchall()
-    elif thingy == "done":
+    elif thingy == "all" and d == "d":
+        sql = """
+          SELECT * FROM todos
+          ORDER BY due_date DESC
+        """
+        cur.execute(sql)
+        results = cur.fetchall()
+    elif thingy == "done" and d == "d":
         sql = """
         SELECT * FROM todos
         WHERE status = ?
+        ORDER BY due_date DESC
         """
-        cur.execute(sql, ("complete",))
+        cur.execute(sql, ("completed",))
         results = cur.fetchall()
-    elif thingy == "not-done":
+    elif thingy == "done" and d == None:
+        sql = """
+            SELECT * FROM todos
+            WHERE status = ?
+            ORDER BY due_date ASC
+            """
+        cur.execute(sql, ("completed",))
+        results = cur.fetchall()
+
+    elif thingy == "not-done" and d == None:
         sql = """
         SELECT * FROM todos
         WHERE status = ?
+        ORDER BY due_date ASC
         """
-        cur.execute(sql, ("not complete",))
+        cur.execute(sql, ("incompleted",))
         results = cur.fetchall()
+    elif thingy == "not-done" and d == "d":
+        sql = """
+        SELECT * FROM todos
+        WHERE status = ?
+        ORDER BY due_date DESC
+        """
+        cur.execute(sql, ("incompleted",))
+        results = cur.fetchall()
+    elif thingy == "project" and d != None and listTodo[0] == "d":
+        val = validate_proj_id(d)
+        if val:
+            sql = """
+                SELECT body, due_date,status,project_id,projects.name AS "proj name"
+                FROM todos 
+                INNER JOIN projects
+                ON todos.project_id = projects.id
+                WHERE project_id = ?
+                ORDER BY due_date DESC
+            """
+            cur.execute(sql, (d,))
+            results = cur.fetchall()
+        else:
+            print(f"project #{d} not exist")
+    elif thingy == "project" and d != None and listTodo[0] == "a":
+        val = validate_proj_id(d)
+        if val:
+            sql = """
+                SELECT body, due_date,status,project_id,projects.name AS "proj name"
+                FROM todos 
+                INNER JOIN projects
+                ON todos.project_id = projects.id
+                WHERE project_id = ?
+                ORDER BY due_date ASC
+            """
+            cur.execute(sql, (d,))
+            results = cur.fetchall()
+        else:
+            print(f"project #{d} not exist")
     else:
         handle_arg_errors("--list")
 
@@ -155,7 +256,7 @@ def lists(thingy=None, *listTodo):
 
 
 def delete(id, *deleteTodos):
-    val = validate_id(id)
+    val = validate_todos_id(id)
     if val:
         sql = """
           DELETE FROM todos WHERE id = ?;
@@ -168,7 +269,7 @@ def delete(id, *deleteTodos):
 
 
 def do(id, *doneTodo):
-    val = validate_id(id)
+    val = validate_todos_id(id)
     if val:
         sql = """
             UPDATE todos
@@ -183,7 +284,7 @@ def do(id, *doneTodo):
 
 
 def undo(id, *doneTodo):
-    val = validate_id(id)
+    val = validate_todos_id(id)
     if val:
         sql = """
             UPDATE todos
@@ -197,8 +298,36 @@ def undo(id, *doneTodo):
         print(f"todo #{id} not exist")
 
 
-def update(id, body):
-    print("update")
+def update(id, *updateTodo):
+    val = validate_todos_id(id)
+    body = updateTodo[0]
+    if val:
+        sql = """
+            UPDATE todos
+            SET body = ?
+            WHERE id = ?;
+        """
+        cur.execute(sql, (body, id,))
+        conn.commit()
+        print(f'Successfully update todo #{id}')
+    else:
+        print(f"todo #{id} not exist")
+
+
+def add_user_id(id, *addUserId):
+    todo_id = validate_todos_id(addUserId[0])
+    user_id = validate_user_id(id)
+    if todo_id and user_id:
+        sql = """
+            UPDATE todos
+            SET user_id = ?
+            WHERE id = ?;
+        """
+        cur.execute(sql, (user_id, todo_id,))
+        conn.commit()
+        print(f'Successfully add user #{id} to todo #{addUserId[0]}')
+    else:
+        print(f"todo #{id} or user #{addUserId[0]}not exist")
 
 
 def helps():
@@ -219,9 +348,9 @@ if __name__ == '__main__':
                 '--do': do,
                 '--undo': undo,
                 '--update': update,
+                '--add_user_id': add_user_id,
                 '--help': helps
             })
-
     except IndexError:
-        print("Error, try python todos.py --help  for more information")
+        print("Argument Error! Look like you don't provide enough argument. Type <python todos.py --help>  for more information")
         # print("IndexError", sys.exc_info())
