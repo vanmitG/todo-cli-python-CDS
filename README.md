@@ -20,13 +20,13 @@ The following **required** functionalities are completed:
 
 - [x] The user can run your program from the command line.
 - [x] The user can see all todos from the command line by passing a list command, sorted with the ones due first.
-- [ ] The user can add a todo from the command line by passing an add argument. The fields specified should be body, due_date, and project_id. The fields due_date and project_id are optional. Only body is required.
-- [ ] By default todos are incomplete.
-- [ ] The user should see a message giving information about the todo that was added.
-- [ ] User can mark a todo as complete by passing a command and an id.
-- [ ] User can mark a todo as incomplete by passing a command and an id.
-- [ ] If the user does not supply the correct arguments, or supplies a --help flag, the user sees a usage message.
-- [ ] The user can supply arguments to the list command to only see todos that are complete.
+- [x] The user can add a todo from the command line by passing an add argument. The fields specified should be body, due_date, and project_id. The fields due_date and project_id are optional. Only body is required.
+- [x] By default todos are incomplete.
+- [x] The user should see a message giving information about the todo that was added.
+- [x] User can mark a todo as complete by passing a command and an id.
+- [x] User can mark a todo as incomplete by passing a command and an id.
+- [x] If the user does not supply the correct arguments, or supplies a --help flag, the user sees a usage message.
+- [x] The user can supply arguments to the list command to only see todos that are complete.
 
 Optional Requirements
 

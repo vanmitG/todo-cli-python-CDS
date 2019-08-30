@@ -12,7 +12,7 @@ sql_todos = """
   CREATE TABLE IF NOT EXISTS todos(
     id INTEGER PRIMARY KEY,
     body TEXT NOT NULL,
-    due_date TEXT NOT NULL,
+    due_date TEXT NOT NULL DEFAULT "",
     status TEXT DEFAULT "incomplete",
     user_id INTERGER
     project_id INTEGER
@@ -38,7 +38,6 @@ cur = conn.cursor()
 cur.execute(sql_todos)
 cur.execute(sql_users)
 cur.execute(sql_projects)
-# print("sql", sql)
 
 
 def show_help_menu():
@@ -76,6 +75,22 @@ def handle_arg_errors(cmd):
     show_help_menu()
 
 
+def validate_id(id):
+    sql = """
+        SELECT id FROM todos
+        ORDER BY due_date
+        """
+    cur.execute(sql)
+    results = cur.fetchall()
+    # print(type(results[2]))
+    for tup1 in results:
+        # extract int from tuple
+        num = tup1[0]
+        if id == num:
+            return id
+    return None
+
+
 def print_results(results):
     try:
         print_result = results
@@ -86,25 +101,33 @@ def print_results(results):
         print("can not find results")
 
 
-def add(body):
-    sql = """
+def add(body, due_date, project_id=None, *addTodos):
 
-      INSERT INTO `todos` (body, due_date, project_id)
-      VALUES (?, ?, ?);
-
-    """
-
-    try:
-        print("add", body)
-    except:
-        print("argument error, try python todos.py --help  for more information")
+    if body == None and due_date == None and project_id == None:
+        handle_arg_errors("--add")
+    elif due_date == None and project_id == None:
+        handle_arg_errors("--add")
+    elif project_id == None:
+        sql = """
+            INSERT INTO `todos` (body,due_date)
+            VALUES (?,?);
+            """
+        cur.execute(sql, (body, due_date,))
+        conn.commit()
+    else:
+        sql = """
+            INSERT INTO `todos` (body,due_date,project_id)
+            VALUES (?,?,?);
+            """
+        cur.execute(sql, (body, due_date, project_id))
+        conn.commit()
+    print("Successfully Add New Todos")
 
 
 def lists(thingy=None, *listTodo):
     # print("extra argument", listTodo)
     results = []
     if thingy == None:
-        print("insideNone")
         sql = """
         SELECT * FROM todos
         ORDER BY due_date
@@ -131,19 +154,50 @@ def lists(thingy=None, *listTodo):
     print_results(results)
 
 
-def delete():
-    print("delete")
+def delete(id, *deleteTodos):
+    val = validate_id(id)
+    if val:
+        sql = """
+          DELETE FROM todos WHERE id = ?;
+        """
+        cur.execute(sql, (id,))
+        conn.commit()
+        print(f'Successfully delete todo #{id}')
+    else:
+        print(f"todo #{id} not exist")
 
 
-def do():
-    print("do")
+def do(id, *doneTodo):
+    val = validate_id(id)
+    if val:
+        sql = """
+            UPDATE todos
+            SET status = ?
+            WHERE id = ?;
+        """
+        cur.execute(sql, ("completed", id,))
+        conn.commit()
+        print(f'Successfully completed todo #{id}')
+    else:
+        print(f"todo #{id} not exist")
 
 
-def undo():
-    print("undo")
+def undo(id, *doneTodo):
+    val = validate_id(id)
+    if val:
+        sql = """
+            UPDATE todos
+            SET status = ?
+            WHERE id = ?;
+        """
+        cur.execute(sql, ("incompleted", id,))
+        conn.commit()
+        print(f'Successfully postpone todo #{id}')
+    else:
+        print(f"todo #{id} not exist")
 
 
-def update():
+def update(id, body):
     print("update")
 
 
