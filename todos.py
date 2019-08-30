@@ -82,6 +82,15 @@ def show_help_menu():
     print("-"*23)
     print("__Add user_id to a todo: ")
     print('python todos.py --add_user_id user-id todo-id')
+    print("-"*23)
+    print("__Add a user to system: ")
+    print('python todos.py --add_user name email')
+    print("-"*23)
+    print("__Add a project to system: ")
+    print('python todos.py --add_project name')
+    print("-"*23)
+    print("__List Projects with staff name: ")
+    print('python todos.py --staff')
 
 
 def handle_arg_errors(cmd):
@@ -135,10 +144,13 @@ def validate_user_id(id):
     return None
 
 
-def print_results(results):
+def print_results(results, table=None):
     try:
         print_result = results
-        print(len(print_result), 'todos')
+        if table == None:
+            print(len(print_result), 'todos')
+        else:
+            print(len(print_result), table)
         for row in print_result:
             print(row)
     except:
@@ -255,68 +267,68 @@ def lists(thingy=None, d=None, *listTodo):
     print_results(results)
 
 
-def delete(id, *deleteTodos):
-    val = validate_todos_id(id)
+def delete(*deleteTodos):
+    val = validate_todos_id(deleteTodos[0])
     if val:
         sql = """
           DELETE FROM todos WHERE id = ?;
         """
-        cur.execute(sql, (id,))
+        cur.execute(sql, (val,))
         conn.commit()
-        print(f'Successfully delete todo #{id}')
+        print(f'Successfully delete todo #{val}')
     else:
-        print(f"todo #{id} not exist")
+        print(f"todo #{deleteTodos[0]} not exist")
 
 
-def do(id, *doneTodo):
-    val = validate_todos_id(id)
+def do(*doneTodo):
+    val = validate_todos_id(doneTodo[0])
     if val:
         sql = """
             UPDATE todos
             SET status = ?
             WHERE id = ?;
         """
-        cur.execute(sql, ("completed", id,))
+        cur.execute(sql, ("completed", val,))
         conn.commit()
-        print(f'Successfully completed todo #{id}')
+        print(f'Successfully completed todo #{val}')
     else:
-        print(f"todo #{id} not exist")
+        print(f"todo #{doneTodo[0]} not exist")
 
 
-def undo(id, *doneTodo):
-    val = validate_todos_id(id)
+def undo(*undoneTodo):
+    val = validate_todos_id(undoneTodo[0])
     if val:
         sql = """
             UPDATE todos
             SET status = ?
             WHERE id = ?;
         """
-        cur.execute(sql, ("incompleted", id,))
+        cur.execute(sql, ("incompleted", val,))
         conn.commit()
-        print(f'Successfully postpone todo #{id}')
+        print(f'Successfully postpone todo #{val}')
     else:
-        print(f"todo #{id} not exist")
+        print(f"todo #{undoneTodo[0]} not exist")
 
 
-def update(id, *updateTodo):
-    val = validate_todos_id(id)
-    body = updateTodo[0]
+def update(*updateTodo):
+    val = validate_todos_id(updateTodo[0])
+    body = updateTodo[1]
     if val:
         sql = """
             UPDATE todos
             SET body = ?
             WHERE id = ?;
         """
-        cur.execute(sql, (body, id,))
+        cur.execute(sql, (body, val,))
         conn.commit()
         print(f'Successfully update todo #{id}')
     else:
-        print(f"todo #{id} not exist")
+        print(f"todo #{updateTodo[0]} not exist")
 
 
-def add_user_id(id, *addUserId):
-    todo_id = validate_todos_id(addUserId[0])
-    user_id = validate_user_id(id)
+def add_user_id(*addUserId):
+    todo_id = validate_todos_id(addUserId[1])
+    user_id = validate_user_id(addUserId[0])
     if todo_id and user_id:
         sql = """
             UPDATE todos
@@ -325,9 +337,67 @@ def add_user_id(id, *addUserId):
         """
         cur.execute(sql, (user_id, todo_id,))
         conn.commit()
-        print(f'Successfully add user #{id} to todo #{addUserId[0]}')
+        print(f'Successfully add user #{addUserId[0]} to todo #{addUserId[1]}')
     else:
-        print(f"todo #{id} or user #{addUserId[0]}not exist")
+        print(f"todo #{addUserId[1]} or user #{addUserId[0]} are not existed.")
+
+
+def add_user(*addUser):
+    name = addUser[0]
+    email = addUser[1]
+    sql = """
+        INSERT INTO `users` (name,email)
+        VALUES (?,?);
+        """
+    cur.execute(sql, (name, email,))
+    conn.commit()
+    print("Successfully Add user")
+
+
+def add_project(*addProject):
+    name = addProject[0]
+    sql = """
+        INSERT INTO `projects` (name)
+        VALUES (?);
+        """
+    cur.execute(sql, (name,))
+    conn.commit()
+    print("Successfully Add projects")
+
+
+def list_user(*listUser):
+    sql = """
+      SELECT * FROM users
+      ORDER BY id
+    """
+    cur.execute(sql)
+    results = cur.fetchall()
+    print_results(results, "users")
+
+
+def list_project(*listProject):
+    sql = """
+      SELECT * FROM projects
+      ORDER BY id
+    """
+    cur.execute(sql)
+    results = cur.fetchall()
+    print_results(results, "projects")
+
+
+def staff():
+    sql = """
+        SELECT projects.name,users.name
+        FROM todos
+        LEFT JOIN users
+        ON todos.user_id = users.id
+        LEFT JOIN projects
+        ON project_id = projects.id
+        ORDER BY projects.name;
+    """
+    cur.execute(sql)
+    results = cur.fetchall()
+    print_results(results, " ")
 
 
 def helps():
@@ -349,6 +419,11 @@ if __name__ == '__main__':
                 '--undo': undo,
                 '--update': update,
                 '--add_user_id': add_user_id,
+                '--add_user': add_user,
+                '--add_project': add_project,
+                '--list_user': list_user,
+                '--list_project': list_project,
+                '--staff': staff,
                 '--help': helps
             })
     except IndexError:
