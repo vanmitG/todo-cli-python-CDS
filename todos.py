@@ -400,6 +400,18 @@ def staff(*staffTodo):
     print_results(results, "lines")
 
 
+def who_to_fire(*wtfTodo):
+    sql = """
+        SELECT id, name FROM users
+        WHERE id NOT IN
+            (SELECT DISTINCT T.user_id
+            FROM todos T);
+    """
+    cur.execute(sql)
+    results = cur.fetchall()
+    print_results(results, "person")
+
+
 def helps():
     show_help_menu()
 
@@ -424,6 +436,7 @@ if __name__ == '__main__':
                 '--list_user': list_user,
                 '--list_project': list_project,
                 '--staff': staff,
+                '--who_to_fire': who_to_fire,
                 '--help': helps
             })
     except IndexError:
