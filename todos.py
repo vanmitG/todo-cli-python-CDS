@@ -65,6 +65,18 @@ def show_help_menu():
     print("__List all todos in a project: ")
     print('python todos.py --list project project_id <a/d> (for sorted by due_date)')
     print("-"*23)
+    print("__List all users: ")
+    print('python todos.py - -list_user')
+    print("-"*23)
+    print("__List all projects: ")
+    print('python todos.py - -list_project')
+    print("-"*23)
+    print("__List Projects with staff name: ")
+    print('python todos.py --staff')
+    print("-"*23)
+    print("__List user who has no project: ")
+    print('python todos.py --who-to-fire')
+    print("-"*23)
     print("__Add a new todo: ")
     print('python todos.py --add', '"My Todo Body"')
     print("-"*23)
@@ -88,9 +100,6 @@ def show_help_menu():
     print("-"*23)
     print("__Add a project to system: ")
     print('python todos.py --add_project name')
-    print("-"*23)
-    print("__List Projects with staff name: ")
-    print('python todos.py --staff')
 
 
 def handle_arg_errors(cmd):
