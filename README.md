@@ -2,7 +2,7 @@
 
 Created with love by: Van Mit
 
-Command line interface(cli) version a simple todo list!
+Command line interface(cli) version of a simple todos app!
 
 <!-- ## Video Walkthrough
 
